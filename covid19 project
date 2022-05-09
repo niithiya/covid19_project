@@ -113,7 +113,7 @@ LIMIT 10
 
 --Using PARTITION BY to find out the maximum population numbers and maximum deaths who are vaccinated by 1 Jan 2022 within the Asian continent
 
-select vac.location, date, ROUND((people_vaccinated/vac.population)*100,2) AS vac_rate, 
+select DISTINCT(vac.location), date, ROUND((people_vaccinated/vac.population)*100,2) AS vac_rate, 
 		MAX(total_deaths) OVER (PARTITION BY vac.location ORDER BY date) AS max_people_dead_by_country,
 		MAX (people_vaccinated) OVER (PARTITION BY vac.location ORDER BY date) AS max_people_vaccinated_by_country
 from covid_vac AS vac
@@ -122,4 +122,3 @@ JOIN covid_deaths AS dea
 where vac.continent='Asia' AND date='2022-01-01' AND people_vaccinated IS NOT NULL 
 group by vac.location, date, people_vaccinated, vac.population, total_deaths
 ORDER BY vac_rate desc
-
