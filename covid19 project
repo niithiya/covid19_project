@@ -1,29 +1,37 @@
 -- Looking at total_cases vs population to identify what percentage of population in Singapore got Covid
+
 SELECT location, total_cases, population, (total_cases/population)*100
 FROM covid_deaths
 WHERE location = 'Singapore'
 ORDER BY total_cases DESC
 
+
 -- Looking at countries with highest infection rate compared to population
+
 SELECT location, population, MAX(total_cases) AS highest_infection_count, ROUND(MAX((total_cases/population))*100,2) as PercentagePopulationInfected
 FROM covid_deaths
 GROUP BY location, population
 ORDER BY location, population
 
+
 -- Showing countries with highest death count per population
+
 SELECT location, MAX(CAST(total_deaths AS NUMERIC)) AS highest_death_count
 FROM covid_deaths
 GROUP BY location, population
 ORDER BY highest_death_count DESC
 
+
 -- Looking at continent death count
+
 SELECT continent, MAX(CAST(total_deaths AS numeric)) AS TotalDeathCount
 FROM covid_deaths
 WHERE continent IS NOT NULL
 GROUP BY continent 
 ORDER BY TotalDeathCount Desc
 
--- GLOBAL NUMBERS
+
+-- Looking at global nuumbers, especially in terms of the number of cases, deaths and death rate
 SELECT location, SUM(CAST(new_cases AS numeric)) AS total_cases,
 				SUM(CAST(new_deaths AS numeric)) AS total_deaths,
 				SUM(CAST(new_deaths AS numeric))/SUM(CAST(new_cases AS numeric))*100 as deathpercentage
@@ -33,7 +41,9 @@ GROUP BY location
 ORDER BY location
 
 
---joining tables to identify location, population, deaths, vaccinations and vaccination rate in Singapore
+--Joining tables to identify vaccination rate against death rate; to prove that vaccination helps in keeping death rate low
+compared to those that are not vaccinated
+
 select dea.location, vac.date, dea.population, dea.total_deaths, 
 	vac.people_fully_vaccinated, MAX(vac.people_fully_vaccinated/vac.population)*100 AS vac_rate
 from covid_deaths AS dea
@@ -44,13 +54,17 @@ GROUP BY dea.location, vac.date, dea.population, dea.total_deaths,
 	vac.people_fully_vaccinated
 ORDER BY vac_rate DESC
 
+
 --Exploring covid_vaccinations table
+
 SELECT location, date, people_fully_vaccinated
 FROM covid_vac
 WHERE location='Singapore' AND people_fully_vaccinated IS NOT NULL
 ORDER BY date
 
+
 -- joining tables to identify vaccinations in the US
+
 SELECT dea.continent, dea.location, vac.date, dea.population, vac.new_vaccinations
 FROM covid_deaths AS dea
 JOIN covid_vac AS vac
@@ -58,7 +72,9 @@ JOIN covid_vac AS vac
 WHERE dea.location='United States'
 ORDER BY dea.location
 
---Understanding the correlation in the Asian continent’s vaccination rate and handwashing facilities 
+
+-- Understanding the correlation in the Asian continent’s vaccination rate and handwashing facilities 
+
 select vac.location, 
 	MAX(life_expectancy) as highestlifeexpectancy, 
 	vac.handwashing_facilities, 
@@ -74,6 +90,7 @@ LIMIT 10
 
 
 --Countries in Asia which have poor vaccination rate and measured against population density
+
 select vac.location, 
 	vac.handwashing_facilities, 
 	population_density,
