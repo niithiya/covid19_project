@@ -122,3 +122,21 @@ JOIN covid_deaths AS dea
 where vac.continent='Asia' AND date='2022-01-01' AND people_vaccinated IS NOT NULL 
 group by vac.location, date, people_vaccinated, vac.population, total_deaths
 ORDER BY vac_rate desc
+
+
+--Using CTE to measure where countries have diabetes prevalence rate of more than 10, which is above the global average in order to identify the average life expectancy against total deaths
+
+WITH s AS(
+	SELECT life_expectancy, location
+	FROM covid_vac
+	WHERE diabetes_prevalence>=10
+)
+SELECT 
+	d.location,
+	MAX(total_deaths),
+	AVG(s.life_expectancy) AS avglife
+FROM covid_deaths AS d
+INNER JOIN s
+ON d.location=s.location
+GROUP BY d.location
+
